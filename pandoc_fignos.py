@@ -217,6 +217,9 @@ def _adjust_caption(fmt, fig, value):
             # pandoc >= 1.17 installs \label for us
             value[0]['c'][1] += \
               [RawInline('tex', r'\protect\label{%s}'%attrs.id)]
+    if fmt == 'docx':
+        # Do not need to generate a figure name/number for word
+        pass
     else:  # Hard-code in the caption name and number/tag
         if fig['is_unnumbered']:
             return
@@ -280,15 +283,6 @@ def _add_markup(fmt, fig, value):
             # Eliminate the id from the Image
             attrs.id = ''
             value[0]['c'][0] = attrs.list
-    elif fmt == 'docx':
-        # As per http://officeopenxml.com/WPhyperlink.php
-        bookmarkstart = \
-          RawBlock('openxml',
-                   '<w:bookmarkStart w:id="0" w:name="%s"/>'
-                   %attrs.id)
-        bookmarkend = \
-          RawBlock('openxml', '<w:bookmarkEnd w:id="0"/>')
-        ret = [bookmarkstart, Para(value), bookmarkend]
     return ret
 
 def process_figures(key, value, fmt, meta):  # pylint: disable=unused-argument
